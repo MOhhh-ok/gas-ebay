@@ -1,4 +1,3 @@
-//.x-ebay-signal
 class EbayWeb {
     html: string = '';
 
@@ -11,14 +10,13 @@ class EbayWeb {
     }
 
     getSignalText() {
-        const xml = XmlService.parse(this.html);
-        const root = xml.getRootElement();
-        const elements = root.getChildren('div');
+        const targetClass = 'x-ebay-signal';
+        // @ts-ignore
+        const $ = Cheerio.load(this.html);
+        const element = $(`.${targetClass}`).first();
 
-        for (const element of elements) {
-            if (element.getAttribute('class').getValue() === 'x-ebay-signal') {
-                return element.getText();
-            }
+        if (element.length) {
+            return element.text();
         }
         return null;
     }
@@ -26,4 +24,11 @@ class EbayWeb {
     private generateItemUrl(id: string) {
         return `https://www.ebay.com/itm/${id}`;
     }
+}
+
+function ebayWebTest() {
+    const id = '156225213767';
+    const ebayWeb = new EbayWeb();
+    ebayWeb.loadItem(id);
+    console.log(ebayWeb.getSignalText());
 }

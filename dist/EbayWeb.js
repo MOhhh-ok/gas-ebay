@@ -1,5 +1,4 @@
 "use strict";
-//.x-ebay-signal
 class EbayWeb {
     constructor() {
         this.html = '';
@@ -11,17 +10,22 @@ class EbayWeb {
         this.html = UrlFetchApp.fetch(url).getContentText();
     }
     getSignalText() {
-        const xml = XmlService.parse(this.html);
-        const root = xml.getRootElement();
-        const elements = root.getChildren('div');
-        for (const element of elements) {
-            if (element.getAttribute('class').getValue() === 'x-ebay-signal') {
-                return element.getText();
-            }
+        const targetClass = 'x-ebay-signal';
+        // @ts-ignore
+        const $ = Cheerio.load(this.html);
+        const element = $(`.${targetClass}`).first();
+        if (element.length) {
+            return element.text();
         }
         return null;
     }
     generateItemUrl(id) {
         return `https://www.ebay.com/itm/${id}`;
     }
+}
+function ebayWebTest() {
+    const id = '156225213767';
+    const ebayWeb = new EbayWeb();
+    ebayWeb.loadItem(id);
+    console.log(ebayWeb.getSignalText());
 }

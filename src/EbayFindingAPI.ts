@@ -157,23 +157,18 @@ class EbayFindingAPI {
         const result: Record<string, string> = {};
         const names = Object.keys(filters) as (keyof EbayFindingAPIFilters)[];
 
-        for (let nIdx = 0; nIdx < names.length; nIdx++) {
-            const name = names[nIdx];
+        let nIdx = 0;
+        for (const name of names) {
             const value = filters[name];
             if (!name || !value) {
                 continue;
-                // throw new Error(
-                //     'name or value is empty. ' + JSON.stringify({ name, value })
-                // );
             }
 
             result[`itemFilter(${nIdx}).name`] = name;
             result[`itemFilter(${nIdx}).value`] = value;
-            // for (let vIdx = 0; vIdx < values.length; vIdx++) {
-            //   const value = values[vIdx];
-            //   result[`itemFilter(${nIdx}).value(${vIdx})`] = value;
-            // }
+            nIdx++;
         }
+
         return result;
     }
 
