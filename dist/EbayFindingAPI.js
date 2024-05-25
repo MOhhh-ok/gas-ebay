@@ -23,7 +23,7 @@ class EbayFindingAPI {
     }
     /** Find */
     findingService(args) {
-        const { operation, options, filters, pageNum, fetchAllPages } = args;
+        const { operation, options, filters, pageNum, fetchAllPages, onPageRetrieved, } = args;
         const ops = Object.assign(options || {}, {
             'OPERATION-NAME': operation,
             'SERVICE-VERSION': this.serviceVersion,
@@ -48,12 +48,20 @@ class EbayFindingAPI {
         const resultItems = res.searchResult[0].item || [];
         const pagination = res.paginationOutput[0];
         const retrievedPageNum = Number(pagination.pageNumber[0]);
-        const totalPages = Number(pagination.totalPages[0]);
+        const totalPages = Number(pagination.totalPages[0]); // 実際に取得できる数よりだいぶ多い
         console.log(JSON.stringify({
             result: resultItems.length,
             page: `${retrievedPageNum}/${totalPages}`,
+            pagination,
         }));
-        if (!fetchAllPages) {
+        if (onPageRetrieved) {
+            onPageRetrieved({
+                items: resultItems,
+                pageNum: retrievedPageNum,
+                total: totalPages,
+            });
+        }
+        if (!fetchAllPages || resultItems.length == 0) {
             return resultItems;
         }
         /** 100ページまでしか取れない */
@@ -61,11 +69,8 @@ class EbayFindingAPI {
             return [
                 ...resultItems,
                 ...this.findingService({
-                    operation,
-                    options,
-                    filters,
+                    ...args,
                     pageNum: retrievedPageNum + 1,
-                    fetchAllPages: fetchAllPages,
                 }),
             ];
         }
@@ -114,16 +119,20 @@ function ebayFindingAPITest() {
     const items = ebay.findingService({
         operation: EbayFindingAPIOperations.FindItemsAdvanced,
         options: {
-            SortOrder: 'StartTimeNewest', //効かない？
-            keywords: 'Garmin nuvi 1300 Automotive GPS Receiver',
+            // SortOrder: 'StartTimeNewest', //効かない？
+            keywords: 'watch',
             // 'keywords': 'Garmin+nuvi+1300+Automotive+GPS+Receiver',
             // 'categoryId': 156955,
         },
         filters: {
-            Seller: 'miyako_sunrise',
+            // Seller: 'miyako_sunrise',
             AvailableTo: 'US',
             // 'SoldItemsOnly': 'true',
         },
+        fetchAllPages: true,
+        onPageRetrieved: (args) => {
+            console.log(args.pageNum, args.total);
+        },
     });
-    console.log(items);
+    // console.log(items);
 }
