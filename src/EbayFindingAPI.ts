@@ -161,9 +161,10 @@ class EbayFindingAPI {
             const name = names[nIdx];
             const value = filters[name];
             if (!name || !value) {
-                throw new Error(
-                    'name or value is empty. ' + JSON.stringify({ name, value })
-                );
+                continue;
+                // throw new Error(
+                //     'name or value is empty. ' + JSON.stringify({ name, value })
+                // );
             }
 
             result[`itemFilter(${nIdx}).name`] = name;
