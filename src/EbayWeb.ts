@@ -1,12 +1,18 @@
 class EbayWeb {
     html: string = '';
 
-    loadItem(id: string) {
-        this.load(this.generateItemUrl(id));
+    loadItem(
+        id: string,
+        options?: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions
+    ) {
+        this.load(this.generateItemUrl(id), options);
     }
 
-    load(url: string) {
-        this.html = UrlFetchApp.fetch(url).getContentText();
+    load(
+        url: string,
+        options?: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions
+    ) {
+        this.html = UrlFetchApp.fetch(url, options || {}).getContentText();
     }
 
     getSignalText() {

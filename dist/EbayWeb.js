@@ -3,11 +3,11 @@ class EbayWeb {
     constructor() {
         this.html = '';
     }
-    loadItem(id) {
-        this.load(this.generateItemUrl(id));
+    loadItem(id, options) {
+        this.load(this.generateItemUrl(id), options);
     }
-    load(url) {
-        this.html = UrlFetchApp.fetch(url).getContentText();
+    load(url, options) {
+        this.html = UrlFetchApp.fetch(url, options || {}).getContentText();
     }
     getSignalText() {
         const targetClass = 'x-ebay-signal';
