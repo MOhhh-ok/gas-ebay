@@ -1,15 +1,8 @@
 "use strict";
-var EbayFindingAPIOperations;
-(function (EbayFindingAPIOperations) {
-    EbayFindingAPIOperations["FindItemsByKeywords"] = "findItemsByKeywords";
-    EbayFindingAPIOperations["FindItemsAdvanced"] = "findItemsAdvanced";
-    EbayFindingAPIOperations["FindCompletedItems"] = "findCompletedItems";
-})(EbayFindingAPIOperations || (EbayFindingAPIOperations = {}));
-const EBAY_FINDING_API_FILTER_KEYS = [
-    'Seller',
-    'AvailableTo',
-    'SoldItemsOnly',
-];
+var EbayFindingAPICondition;
+(function (EbayFindingAPICondition) {
+    EbayFindingAPICondition[EbayFindingAPICondition["Used"] = 3000] = "Used";
+})(EbayFindingAPICondition || (EbayFindingAPICondition = {}));
 /**
  * eBay用クラス
  * FindingAPI 5,000 API calls per day
@@ -114,17 +107,15 @@ function ebayFindingAPITest() {
         appId: PropertiesService.getScriptProperties().getProperty('APP_ID'),
     });
     const items = ebay.findingService({
-        operation: EbayFindingAPIOperations.FindItemsAdvanced,
+        operation: 'findItemsAdvanced',
         options: {
-            // SortOrder: 'StartTimeNewest', //効かない？
+            sortOrder: 'BestMatch',
             keywords: 'watch',
-            // 'keywords': 'Garmin+nuvi+1300+Automotive+GPS+Receiver',
-            // 'categoryId': 156955,
         },
         filters: {
-            // Seller: 'miyako_sunrise',
+            Condition: EbayFindingAPICondition.Used,
             AvailableTo: 'US',
-            // 'SoldItemsOnly': 'true',
+            ListingType: 'AuctionWithBIN',
         },
         fetchAllPages: true,
         onPageRetrieved: (args) => {

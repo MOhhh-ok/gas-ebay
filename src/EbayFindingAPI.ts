@@ -1,27 +1,34 @@
-enum EbayFindingAPIOperations {
-    FindItemsByKeywords = 'findItemsByKeywords',
-    FindItemsAdvanced = 'findItemsAdvanced',
-    FindCompletedItems = 'findCompletedItems', // 提供終了
+type EbayFindingAPIOperation =
+    | 'findItemsByKeywords'
+    | 'findItemsAdvanced'
+    | 'findCompletedItems'; // 提供終了
+
+enum EbayFindingAPICondition {
+    Used = 3000,
 }
 
-const EBAY_FINDING_API_FILTER_KEYS = [
-    'Seller',
-    'AvailableTo',
-    'SoldItemsOnly',
-] as const;
-
-type EbayFindingAPIFilters = Partial<
-    Record<(typeof EBAY_FINDING_API_FILTER_KEYS)[number], string>
->;
+type EbayFindingAPIFilters = {
+    Seller?: string;
+    AvailableTo?: string;
+    ListingType?:
+        | 'Auction' // Not Buy It Now
+        | 'AuctionWithBIN' // Buy It Now
+        | 'Classified'
+        | 'FixedPrice'
+        | 'StoreInventory'
+        | 'All';
+    Condition?: EbayFindingAPICondition;
+};
 
 type EbayFindingAPIOptions = {
-    ['OPERATION-NAME']?: string;
+    ['OPERATION-NAME']?: EbayFindingAPIOperation;
     ['SERVICE-VERSION']?: string;
     ['SECURITY-APPNAME']?: string;
     ['RESPONSE-DATA-FORMAT']?: string;
     ['REST-PAYLOAD']?: string;
     ['paginationInput.pageNumber']?: number;
     ['keywords']?: string;
+    ['sortOrder']?: 'BestMatch';
 } & Record<string, string>;
 
 type EbayFindingAPIResponse = {
@@ -42,7 +49,7 @@ type EbayFindingAPIResponse = {
 } & Record<string, any>;
 
 type EbayFindingServiceArgs = {
-    operation: EbayFindingAPIOperations;
+    operation: EbayFindingAPIOperation;
     options?: EbayFindingAPIOptions;
     filters: EbayFindingAPIFilters;
     pageNum?: number;
@@ -165,7 +172,7 @@ class EbayFindingAPI {
             }
 
             result[`itemFilter(${nIdx}).name`] = name;
-            result[`itemFilter(${nIdx}).value`] = value;
+            result[`itemFilter(${nIdx}).value`] = value as any;
             nIdx++;
         }
 
@@ -193,17 +200,15 @@ function ebayFindingAPITest() {
         appId: PropertiesService.getScriptProperties().getProperty('APP_ID'),
     });
     const items = ebay.findingService({
-        operation: EbayFindingAPIOperations.FindItemsAdvanced,
+        operation: 'findItemsAdvanced',
         options: {
-            // SortOrder: 'StartTimeNewest', //効かない？
+            sortOrder: 'BestMatch',
             keywords: 'watch',
-            // 'keywords': 'Garmin+nuvi+1300+Automotive+GPS+Receiver',
-            // 'categoryId': 156955,
         },
         filters: {
-            // Seller: 'miyako_sunrise',
+            Condition: EbayFindingAPICondition.Used,
             AvailableTo: 'US',
-            // 'SoldItemsOnly': 'true',
+            ListingType: 'AuctionWithBIN',
         },
         fetchAllPages: true,
         onPageRetrieved: (args) => {
