@@ -8,6 +8,7 @@ type Condition = 'NEW' | 'USED' | 'UNSPECIFIED';
 
 interface Filter {
   sellers?: string[];
+  deliveryCountry?: string;
   itemLocationCountry?: string;
   buyingOptions?: BuyingOption[];
   conditions?: Condition[];
@@ -55,15 +56,16 @@ function createFilterString(filter: Filter | undefined) {
   result.push(createFilterArrayString('buyingOptions', filter.buyingOptions));
   result.push(createFilterArrayString('conditions', filter.conditions));
   result.push(createFilterValueString('itemLocationCountry', filter.itemLocationCountry));
+  result.push(createFilterValueString('deliveryCountry', filter.deliveryCountry));
   return result.filter(Boolean).join(',');
 }
 
-function createFilterArrayString(key: string, values: string[] | undefined) {
+function createFilterArrayString(key: keyof Filter, values: string[] | undefined) {
   if (!values) return undefined;
   return `${key}:{${values.join('|')}}`
 }
 
-function createFilterValueString(key: string, value: string | undefined) {
+function createFilterValueString(key: keyof Filter, value: string | undefined) {
   if (!value) return undefined;
   return `${key}:${value}`;
 }

@@ -72,4 +72,7 @@ export interface ItemSummary {
   topRatedBuyingExperience: boolean;
   priorityListing: boolean;
   listingMarketplaceId: string;
+
+  /** This field is restricted to applications that have been granted permission to access this feature. */
+  watchCount?: number;
 }

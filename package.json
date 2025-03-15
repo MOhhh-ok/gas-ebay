@@ -10,12 +10,13 @@
   "scripts": {
     "test:apply": "gasup --bundle --push",
     "build": "tsc",
-    "watch": "tsc --watch"
+    "dev": "tsc --watch"
   },
+  "dependencies": {},
   "devDependencies": {
+    "@types/google-apps-script-oauth2": "^38.0.4",
     "@types/cheerio": "^0.22.35",
     "@types/google-apps-script": "^1.0.83",
-    "@types/google-apps-script-oauth2": "^38.0.4",
     "@types/node": "^20.12.12",
     "dotenv": "^16.4.7",
     "dotenv-cli": "^8.0.0",
